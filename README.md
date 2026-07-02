@@ -32,12 +32,30 @@ Assumptions: **3% inflation**, **5% investment return**, lifestyle funded to **a
 
 Illustration only — not financial advice.
 
-## Lead form / deployment note
+## Lead form (Web3Forms)
 
-The "Get the guide" form uses [Netlify Forms](https://docs.netlify.com/forms/setup/)
-(`data-netlify="true"`). It captures submissions automatically **only when deployed on Netlify**.
-On any other host (e.g. GitHub Pages) the form falls back to a client-side thank-you and does
-**not** store the lead. To capture leads elsewhere, swap the form action for a service like
-Formspree, Getform, or a custom endpoint.
+The "Get the guide" form posts to [Web3Forms](https://web3forms.com), which emails each
+submission (name, phone, email, and the visitor's metre result) to you. No backend required,
+so it works on any static host including Cloudflare Pages.
 
-Remember to update `site` in `astro.config.mjs` to your final domain.
+**Setup (one time):**
+
+1. Go to https://web3forms.com and enter the email address where you want leads delivered.
+2. They email you an **access key**.
+3. In `src/pages/index.astro`, find `YOUR_WEB3FORMS_ACCESS_KEY` and replace it with your key.
+4. Commit and push — Cloudflare redeploys automatically.
+
+The access key is safe to keep in the public repo; spam is blocked by the hidden `botcheck`
+honeypot. Until a real key is set, the form just shows the on-page thank-you and stores nothing.
+
+## Deploy on Cloudflare Pages
+
+Connect this GitHub repo in the Cloudflare dashboard (Workers & Pages → Create → Pages →
+Connect to Git) with:
+
+- **Framework preset:** Astro
+- **Build command:** `npm run build`
+- **Build output directory:** `dist`
+
+Every push to `main` triggers a deploy. Remember to update `site` in `astro.config.mjs`
+to your final domain (used for canonical URLs / SEO).

@@ -132,13 +132,21 @@ const WA = "https://wa.me/+6591731132";
       <form
         id="guideForm"
         class="fbm-guide-form reveal mt-3"
-        name="fire-your-boss-guide"
+        action="https://api.web3forms.com/submit"
         method="POST"
-        data-netlify="true"
-        netlify-honeypot="bot-field"
       >
-        <input type="hidden" name="form-name" value="fire-your-boss-guide" />
-        <p hidden><label>Don't fill this out: <input name="bot-field" /></label></p>
+        <!--
+          Web3Forms access key. Get a free one in ~30 seconds at https://web3forms.com
+          (enter the email where you want leads delivered; they email you the key).
+          Paste it below, replacing YOUR_WEB3FORMS_ACCESS_KEY. It is safe to expose
+          publicly — spam is blocked by the honeypot field below.
+        -->
+        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
+        <input type="hidden" name="subject" value="New Fire Your Boss guide request" />
+        <input type="hidden" name="from_name" value="Fire Your Boss Metre" />
+
+        <!-- Honeypot: humans leave this empty; bots fill it and get rejected -->
+        <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
 
         <!-- Carries the user's result into the submission for context -->
         <input type="hidden" id="guideMeter" name="metre-result" value="" />
@@ -158,6 +166,7 @@ const WA = "https://wa.me/+6591731132";
           </div>
         </div>
         <button type="submit" class="btn btn-gold" style="width: 100%;">Send Me the Guide&nbsp;→</button>
+        <p id="guideError" class="fbm-guide-error" hidden></p>
         <p class="fbm-consent">
           By submitting, you agree to receive the guide and occasional follow-ups from Kang.
           No spam, unsubscribe anytime.
@@ -364,6 +373,13 @@ const WA = "https://wa.me/+6591731132";
     line-height: 1.6;
     text-align: center;
   }
+  .fbm-guide-error {
+    color: #ffb4ab;
+    font-size: 0.875rem;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
 
   @media (max-width: 900px) {
     .fbm-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -506,20 +522,58 @@ const WA = "https://wa.me/+6591731132";
       output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
-    // Lead form: on a static/local preview (no Netlify), show a thank-you instead of erroring.
+    // Lead form: submit to Web3Forms via fetch so we can show an inline thank-you.
     var guideForm = document.getElementById('guideForm');
     if (guideForm) {
       guideForm.addEventListener('submit', function (e) {
-        var onNetlify = /netlify|\.app$/.test(location.hostname);
-        if (onNetlify) return;
         e.preventDefault();
+
+        var errEl = document.getElementById('guideError');
+        if (errEl) errEl.hidden = true;
+
         if (!guideForm.checkValidity()) {
           guideForm.reportValidity();
           return;
         }
-        guideForm.hidden = true;
-        var thanks = document.getElementById('guideThanks');
-        if (thanks) thanks.hidden = false;
+
+        function showThanks() {
+          guideForm.hidden = true;
+          var thanks = document.getElementById('guideThanks');
+          if (thanks) thanks.hidden = false;
+        }
+
+        var keyField = guideForm.querySelector('input[name="access_key"]');
+        var key = keyField ? keyField.value : '';
+
+        // Not configured yet (placeholder key) or offline preview: just confirm to the user.
+        if (!key || key === 'YOUR_WEB3FORMS_ACCESS_KEY') {
+          showThanks();
+          return;
+        }
+
+        var submitBtn = guideForm.querySelector('button[type="submit"]');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(guideForm)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data.success) {
+              showThanks();
+            } else {
+              throw new Error((data && data.message) || 'Submission failed');
+            }
+          })
+          .catch(function () {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send Me the Guide →'; }
+            if (errEl) {
+              errEl.textContent = 'Sorry, something went wrong. Please try again, or message Kang on WhatsApp.';
+              errEl.hidden = false;
+            }
+          });
       });
     }
   })();
