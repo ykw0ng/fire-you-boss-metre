@@ -354,8 +354,28 @@ strong { font-weight: 600; }
   }
 }
 
-/* Floating WA clearance on mobile */
+/* ---- Mobile ---- */
 @media (max-width: 768px) {
-  .container { padding-right: max(1.5rem, 5.5rem); }
-  .page-header__inner { padding-right: max(1.5rem, 5.5rem); }
+  /* Tighter hero so the calculator is closer to the fold */
+  .page-header {
+    padding: 3.25rem 1.5rem 2.75rem;
+  }
+
+  /* Sit the floating button in the corner, respecting notch/home-indicator safe areas */
+  .wa-float {
+    width: 52px;
+    height: 52px;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    right: max(1rem, env(safe-area-inset-right));
+  }
+  .wa-float svg { width: 27px; height: 27px; }
+
+  /* Give the last content room to clear the floating button */
+  main { padding-bottom: 4.5rem; }
+}
+
+@media (max-width: 400px) {
+  .nav__inner { padding: 0 1rem; }
+  /* Drop the header's WhatsApp label on very narrow screens; the floating button covers it */
+  .nav__wa span { display: none; }
 }
