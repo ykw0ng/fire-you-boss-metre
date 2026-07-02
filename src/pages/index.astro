@@ -519,6 +519,13 @@ const WA = "https://wa.me/+6591731132";
           ' | ' + (gap <= 0 ? 'surplus ' : 'shortfall ') + fmt(Math.abs(gap));
       }
 
+      // Remember these inputs so a page refresh keeps the user's result.
+      try {
+        sessionStorage.setItem('fbm', JSON.stringify({
+          age: currentAge, expense: expense, assets: assets, fire: fireAge
+        }));
+      } catch (err) { /* storage unavailable — non-fatal */ }
+
       output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
@@ -576,5 +583,40 @@ const WA = "https://wa.me/+6591731132";
           });
       });
     }
+
+    // Prefill from URL query params and auto-calculate when all four are present.
+    // Enables shareable example links, e.g.
+    //   /?age=38&expense=60000&assets=200000&fire=55
+    (function () {
+      var map = { age: 'currentAge', expense: 'yearlyExpense', assets: 'liquidAssets', fire: 'fireAge' };
+
+      // Source values from the URL first, then fall back to the last saved inputs.
+      var params = new URLSearchParams(location.search);
+      var source = {};
+      Object.keys(map).forEach(function (key) { source[key] = params.get(key); });
+
+      var hasUrl = Object.keys(map).every(function (key) {
+        return source[key] !== null && source[key] !== '';
+      });
+
+      if (!hasUrl) {
+        try {
+          var saved = JSON.parse(sessionStorage.getItem('fbm') || 'null');
+          if (saved) source = saved;
+        } catch (err) { /* ignore */ }
+      }
+
+      var filled = 0;
+      Object.keys(map).forEach(function (key) {
+        var val = source[key];
+        if (val !== null && val !== undefined && val !== '') {
+          var el = document.getElementById(map[key]);
+          if (el) { el.value = val; filled++; }
+        }
+      });
+      if (filled === 4) {
+        form.requestSubmit();
+      }
+    })();
   })();
 </script>
