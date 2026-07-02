@@ -1,0 +1,526 @@
+---
+import Layout from '../layouts/Layout.astro';
+const WA = "https://wa.me/+6591731132";
+---
+
+<Layout>
+
+  <!-- Hero -->
+  <section class="page-header">
+    <div class="page-header__inner">
+      <p class="hero__eyebrow" style="margin-bottom: 1rem;">Financial Independence Calculator</p>
+      <h1>Fire&nbsp;Your&nbsp;Boss <span class="text-gold">Metre</span></h1>
+      <p style="color: rgba(246, 243, 236, 0.82); max-width: 620px; margin-top: 1.25rem; font-size: 1.0625rem;">
+        Four numbers is all it takes. See exactly how much invested capital you need to walk away
+        from work on your terms &mdash; and how close you already are.
+      </p>
+    </div>
+  </section>
+
+  <!-- Calculator -->
+  <section class="section">
+    <div class="container">
+      <div class="fbm-grid">
+
+        <!-- Inputs -->
+        <div class="fbm-panel reveal">
+          <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Your Numbers</h2>
+          <p style="color: var(--mid-gray); font-size: 0.9375rem; margin-bottom: 2rem;">
+            All figures in SGD. Estimates are fine.
+          </p>
+
+          <form id="fbmForm" novalidate>
+            <div class="form-group">
+              <label for="currentAge">Current age</label>
+              <input type="number" id="currentAge" name="currentAge" min="18" max="86" step="1" placeholder="e.g. 38" required />
+            </div>
+
+            <div class="form-group">
+              <label for="yearlyExpense">Current yearly expenses</label>
+              <div class="fbm-input-prefix">
+                <span>$</span>
+                <input type="number" id="yearlyExpense" name="yearlyExpense" min="0" step="1000" placeholder="e.g. 60,000" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="liquidAssets">Current estimated liquid assets</label>
+              <div class="fbm-input-prefix">
+                <span>$</span>
+                <input type="number" id="liquidAssets" name="liquidAssets" min="0" step="1000" placeholder="e.g. 200,000" required />
+              </div>
+              <p class="fbm-hint">Cash, stocks, bonds, and other investments you could draw on &mdash; not your home.</p>
+            </div>
+
+            <div class="form-group">
+              <label for="fireAge">Age you hope to fire your boss</label>
+              <input type="number" id="fireAge" name="fireAge" min="19" max="86" step="1" placeholder="e.g. 55" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+              Calculate My Metre&nbsp;→
+            </button>
+            <p id="fbmError" class="fbm-error" hidden></p>
+          </form>
+
+          <p class="fbm-assumptions">
+            Assumes <strong>3% inflation</strong>, <strong>5% investment return</strong>, and funding your
+            lifestyle to <strong>age 87</strong>. Illustrative only &mdash; not financial advice.
+          </p>
+        </div>
+
+        <!-- Results -->
+        <div class="fbm-results" id="fbmResults" aria-live="polite">
+          <div class="fbm-placeholder" id="fbmPlaceholder">
+            <div class="fbm-placeholder__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18" />
+                <path d="M18 17V9M13 17V5M8 17v-3" />
+              </svg>
+            </div>
+            <p>Fill in your numbers and hit calculate to see your Fire Your Boss Metre.</p>
+          </div>
+
+          <div class="fbm-output" id="fbmOutput" hidden>
+            <!-- The metre -->
+            <div class="fbm-meter-head">
+              <span class="fbm-meter-label">Your Fire Your Boss Metre</span>
+              <span class="fbm-pct" id="fbmPct">0%</span>
+            </div>
+            <div class="fbm-bar">
+              <div class="fbm-bar__fill" id="fbmBarFill"></div>
+            </div>
+            <p class="fbm-verdict" id="fbmVerdict"></p>
+
+            <!-- Key figures -->
+            <div class="fbm-figures">
+              <div class="fbm-figure">
+                <span class="fbm-figure__label">Target at fire age</span>
+                <span class="fbm-figure__value" id="fbmTarget">&mdash;</span>
+                <span class="fbm-figure__note" id="fbmTargetNote"></span>
+              </div>
+              <div class="fbm-figure">
+                <span class="fbm-figure__label">Projected assets by then</span>
+                <span class="fbm-figure__value" id="fbmProjected">&mdash;</span>
+                <span class="fbm-figure__note">Your assets today, grown at 5%/yr</span>
+              </div>
+              <div class="fbm-figure" id="fbmGapWrap">
+                <span class="fbm-figure__label" id="fbmGapLabel">Shortfall</span>
+                <span class="fbm-figure__value" id="fbmGap">&mdash;</span>
+                <span class="fbm-figure__note" id="fbmGapNote"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Lead capture -->
+  <section class="section section--dark" id="guideSection">
+    <div class="container" style="max-width: 640px;">
+      <div class="text-center reveal">
+        <p class="hero__eyebrow" style="justify-content: center;">Free Guide</p>
+        <h2>Get the <span class="text-gold">How to Fire Your Boss</span> guide</h2>
+        <p style="max-width: 520px; margin: 1.25rem auto 0;">
+          A practical, no-jargon playbook for closing the gap you just saw &mdash; built for
+          high-income professionals who want out on their own terms. Kang will send it to you personally.
+        </p>
+      </div>
+
+      <form
+        id="guideForm"
+        class="fbm-guide-form reveal mt-3"
+        name="fire-your-boss-guide"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+      >
+        <input type="hidden" name="form-name" value="fire-your-boss-guide" />
+        <p hidden><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <!-- Carries the user's result into the submission for context -->
+        <input type="hidden" id="guideMeter" name="metre-result" value="" />
+
+        <div class="form-group">
+          <label for="guideName">Name</label>
+          <input type="text" id="guideName" name="name" required placeholder="Your name" />
+        </div>
+        <div class="fbm-guide-row">
+          <div class="form-group">
+            <label for="guidePhone">Contact number</label>
+            <input type="tel" id="guidePhone" name="phone" required placeholder="+65 9123 4567" />
+          </div>
+          <div class="form-group">
+            <label for="guideEmail">Email</label>
+            <input type="email" id="guideEmail" name="email" required placeholder="your@email.com" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width: 100%;">Send Me the Guide&nbsp;→</button>
+        <p class="fbm-consent">
+          By submitting, you agree to receive the guide and occasional follow-ups from Kang.
+          No spam, unsubscribe anytime.
+        </p>
+      </form>
+
+      <div id="guideThanks" class="text-center" hidden style="margin-top: 1rem;">
+        <h3 style="font-family: var(--font-serif); font-style: normal; color: var(--gold); margin-bottom: 0.75rem;">You're on the list.</h3>
+        <p>Thanks &mdash; Kang will send the guide to your inbox shortly. Want to talk sooner?</p>
+        <a href={WA} class="btn-wa" target="_blank" rel="noopener noreferrer" style="margin-top: 1.25rem;">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M16 2C8.268 2 2 8.268 2 16c0 2.442.654 4.733 1.793 6.713L2 30l7.47-1.766A13.93 13.93 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2z" fill="#25D366"/>
+            <path d="M16 4c6.627 0 12 5.373 12 12s-5.373 12-12 12a11.95 11.95 0 01-6.02-1.617l-.43-.265-4.434 1.048 1.08-4.31-.29-.447A11.95 11.95 0 014 16C4 9.373 9.373 4 16 4z" fill="white"/>
+            <path d="M12.243 10c-.262 0-.687.098-.954.393-.267.295-1.02 1.001-1.02 2.44s1.043 2.832 1.189 3.027c.146.196 2.046 3.16 5.04 4.306 2.494.97 2.997.778 3.539.729.542-.049 1.748-.714 1.994-1.404.246-.69.246-1.281.172-1.404-.073-.122-.269-.196-.563-.343-.295-.147-1.748-.862-2.018-.959-.269-.098-.465-.147-.66.147-.196.294-.758.959-.929 1.155-.171.196-.342.22-.637.073-.294-.147-1.245-.46-2.372-1.467-.877-.784-1.469-1.75-1.64-2.044-.172-.294-.018-.453.129-.599.132-.132.294-.343.441-.515.147-.171.196-.294.294-.49.098-.196.049-.368-.025-.515-.073-.147-.66-1.6-.905-2.19-.24-.576-.483-.497-.66-.506L12.243 10z" fill="#25D366"/>
+          </svg>
+          WhatsApp&nbsp;Kang
+        </a>
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .fbm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    align-items: start;
+  }
+
+  .fbm-panel {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 28px rgba(28, 61, 56, 0.06);
+  }
+
+  .fbm-input-prefix {
+    display: flex;
+    align-items: center;
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: 2px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .fbm-input-prefix:focus-within {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(28, 61, 56, 0.08);
+  }
+  .fbm-input-prefix span {
+    padding: 0 0.5rem 0 1.125rem;
+    color: var(--mid-gray);
+    font-size: 1rem;
+  }
+  .fbm-input-prefix input {
+    border: none !important;
+    box-shadow: none !important;
+    padding-left: 0.25rem;
+  }
+
+  .fbm-hint {
+    font-size: 0.8125rem;
+    color: var(--mid-gray);
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .fbm-error {
+    color: #b4453a;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+
+  .fbm-assumptions {
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--light-gray);
+    font-size: 0.8125rem;
+    color: var(--mid-gray);
+    line-height: 1.7;
+  }
+
+  /* Results */
+  .fbm-results {
+    background: linear-gradient(160deg, var(--navy-light) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+    border-radius: 12px;
+    padding: 2.5rem;
+    color: var(--warm-white);
+    min-height: 100%;
+    box-shadow: 0 12px 36px rgba(15, 33, 29, 0.25);
+  }
+
+  .fbm-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    min-height: 360px;
+    color: rgba(246, 243, 236, 0.7);
+  }
+  .fbm-placeholder__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(201, 169, 110, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .fbm-placeholder__icon svg { width: 30px; height: 30px; }
+  .fbm-placeholder p { max-width: 260px; }
+
+  /* Metre */
+  .fbm-meter-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.875rem;
+  }
+  .fbm-meter-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(246, 243, 236, 0.75);
+  }
+  .fbm-pct {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--gold);
+  }
+  .fbm-bar {
+    height: 16px;
+    background: rgba(246, 243, 236, 0.12);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .fbm-bar__fill {
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 1.1s var(--ease-out);
+  }
+  .fbm-verdict {
+    margin-top: 1.25rem;
+    margin-bottom: 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.125rem;
+    color: var(--warm-white);
+    line-height: 1.5;
+  }
+
+  .fbm-figures {
+    margin-top: 2.25rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(201, 169, 110, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .fbm-figure { display: flex; flex-direction: column; gap: 0.25rem; }
+  .fbm-figure__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(246, 243, 236, 0.65);
+  }
+  .fbm-figure__value {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    color: var(--warm-white);
+    line-height: 1.1;
+  }
+  .fbm-figure__note {
+    font-size: 0.8125rem;
+    color: rgba(246, 243, 236, 0.6);
+    line-height: 1.5;
+  }
+
+  /* Lead form */
+  .fbm-guide-form { max-width: 100%; }
+  .fbm-guide-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .fbm-guide-form label { color: var(--gold); }
+  .fbm-consent {
+    font-size: 0.75rem;
+    color: rgba(246, 243, 236, 0.55);
+    margin-top: 1rem;
+    margin-bottom: 0;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .fbm-grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+  @media (max-width: 600px) {
+    .fbm-panel, .fbm-results { padding: 1.75rem; }
+    .fbm-guide-row { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var INFLATION = 0.03;
+    var RETURN = 0.05;
+    var END_AGE = 87;
+
+    var form = document.getElementById('fbmForm');
+    var errorEl = document.getElementById('fbmError');
+    var placeholder = document.getElementById('fbmPlaceholder');
+    var output = document.getElementById('fbmOutput');
+
+    function fmt(n) {
+      return '$' + Math.round(n).toLocaleString('en-US');
+    }
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.hidden = false;
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      errorEl.hidden = true;
+
+      var currentAge = parseFloat(document.getElementById('currentAge').value);
+      var expense = parseFloat(document.getElementById('yearlyExpense').value);
+      var assets = parseFloat(document.getElementById('liquidAssets').value);
+      var fireAge = parseFloat(document.getElementById('fireAge').value);
+
+      if ([currentAge, expense, assets, fireAge].some(function (v) { return isNaN(v); })) {
+        showError('Please fill in all four fields with numbers.');
+        return;
+      }
+      if (currentAge < 18 || currentAge > 85) {
+        showError('Please enter a current age between 18 and 85.');
+        return;
+      }
+      if (fireAge <= currentAge) {
+        showError('Your fire-your-boss age must be later than your current age.');
+        return;
+      }
+      if (fireAge >= END_AGE) {
+        showError('Your fire-your-boss age must be before 87.');
+        return;
+      }
+      if (expense < 0 || assets < 0) {
+        showError('Expenses and assets cannot be negative.');
+        return;
+      }
+
+      var yearsToFire = fireAge - currentAge;
+      var retirementYears = END_AGE - fireAge;
+
+      // Expenses in the first year of retirement (today's expense grown by inflation)
+      var expenseAtFire = expense * Math.pow(1 + INFLATION, yearsToFire);
+
+      // Required nest egg at fire age: present value of a growing annuity-due,
+      // withdrawals at the start of each retirement year, growing with inflation,
+      // discounted at the investment return.
+      var k = (1 + INFLATION) / (1 + RETURN);
+      var required = expenseAtFire * (1 - Math.pow(k, retirementYears)) / (1 - k);
+
+      // What today's assets grow to by the fire age (invested at the return rate)
+      var projected = assets * Math.pow(1 + RETURN, yearsToFire);
+
+      var pct = required > 0 ? (projected / required) * 100 : 100;
+      var pctDisplay = Math.min(100, Math.max(0, pct));
+
+      var gap = required - projected;
+
+      // Render
+      placeholder.hidden = true;
+      output.hidden = false;
+
+      document.getElementById('fbmTarget').textContent = fmt(required);
+      document.getElementById('fbmTargetNote').textContent =
+        'To fund ' + fmt(expenseAtFire) + '/yr (age ' + fireAge + ') rising with inflation to 87';
+      document.getElementById('fbmProjected').textContent = fmt(projected);
+
+      var pctEl = document.getElementById('fbmPct');
+      var barFill = document.getElementById('fbmBarFill');
+      var verdict = document.getElementById('fbmVerdict');
+      var gapLabel = document.getElementById('fbmGapLabel');
+      var gapEl = document.getElementById('fbmGap');
+      var gapNote = document.getElementById('fbmGapNote');
+
+      var rounded = Math.round(pct);
+
+      if (gap <= 0) {
+        gapLabel.textContent = 'Surplus';
+        gapEl.textContent = fmt(Math.abs(gap));
+        gapNote.textContent = "You're projected to clear your target — congratulations.";
+        verdict.textContent = "You can fire your boss at " + fireAge + ". You're on track.";
+      } else {
+        gapLabel.textContent = 'Shortfall';
+        gapEl.textContent = fmt(gap);
+        var months = yearsToFire * 12;
+        var mRate = RETURN / 12;
+        var fvFactor = (Math.pow(1 + mRate, months) - 1) / mRate;
+        var monthly = gap / fvFactor;
+        gapNote.textContent = 'Invest about ' + fmt(monthly) + '/mo at 5% to close this by age ' + fireAge + '.';
+
+        if (rounded >= 75) {
+          verdict.textContent = "Nearly there — a modest push closes the gap.";
+        } else if (rounded >= 40) {
+          verdict.textContent = "You're on your way, but there's real ground to make up.";
+        } else {
+          verdict.textContent = "The gap is wide today — the sooner you plan, the easier it gets.";
+        }
+      }
+
+      pctEl.textContent = rounded + '%';
+
+      barFill.style.width = '0%';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          barFill.style.width = pctDisplay + '%';
+        });
+      });
+
+      var meterField = document.getElementById('guideMeter');
+      if (meterField) {
+        meterField.value =
+          rounded + '% to fire age ' + fireAge +
+          ' | target ' + fmt(required) +
+          ' | projected ' + fmt(projected) +
+          ' | ' + (gap <= 0 ? 'surplus ' : 'shortfall ') + fmt(Math.abs(gap));
+      }
+
+      output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    // Lead form: on a static/local preview (no Netlify), show a thank-you instead of erroring.
+    var guideForm = document.getElementById('guideForm');
+    if (guideForm) {
+      guideForm.addEventListener('submit', function (e) {
+        var onNetlify = /netlify|\.app$/.test(location.hostname);
+        if (onNetlify) return;
+        e.preventDefault();
+        if (!guideForm.checkValidity()) {
+          guideForm.reportValidity();
+          return;
+        }
+        guideForm.hidden = true;
+        var thanks = document.getElementById('guideThanks');
+        if (thanks) thanks.hidden = false;
+      });
+    }
+  })();
+</script>
