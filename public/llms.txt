@@ -1,0 +1,15 @@
+# Fire Your Boss Metre
+
+> A free financial-independence calculator by Kang. Enter four numbers and see how much invested capital you need to stop working on your terms — and how close you already are.
+
+The Fire Your Boss Metre takes four inputs — current age, current yearly expenses, current estimated liquid assets, and the age you hope to "fire your boss" — and calculates the invested nest egg needed at that age to fund your lifestyle to age 87, assuming 3% inflation and a 5% investment return (a growing annuity). It then compares your current assets, grown at 5%, against that target and shows how close you are as a percentage, plus the monthly investment needed to close any gap.
+
+## Links
+
+- [Fire Your Boss Metre calculator](https://fireyourbossmetre.com/): the calculator itself
+- [WhatsApp Kang](https://wa.me/+6591731132): speak with Kang directly
+
+## Notes
+
+- This tool is illustrative only and does not constitute financial advice.
+- Operated by Wong Yong Kang ("Kang"), an authorised financial consultant representing finexis advisory Pte Ltd (Reg No. 200408660G).
