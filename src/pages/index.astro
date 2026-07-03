@@ -541,12 +541,14 @@ const WA = "https://wa.me/+6591731132";
     //      /forms/d/e/FORM_ID/viewform  → put it in `action`.
     // Until FORM_ID is set, the form just shows the on-page thank-you.
     var GOOGLE_FORM = {
-      action: 'https://docs.google.com/forms/d/e/FORM_ID/formResponse',
+      action: 'https://docs.google.com/forms/d/e/1FAIpQLSd2y22errRnIXyqqYk7oT5TJw_4lygQkmev1eGTN7GMKZBgeA/formResponse',
       fields: {
-        name:  'entry.NAME_ID',
-        phone: 'entry.PHONE_ID',
-        email: 'entry.EMAIL_ID',
-        metre: 'entry.METRE_ID'   // optional — remove this line if you skip that question
+        name:  'entry.1571573456',
+        phone: 'entry.739259850',
+        email: 'entry.820970474'
+        // No "metre result" question on the form yet. To capture how close each
+        // lead was, add a short-answer question to the Google Form, then add its
+        // id here as:  metre: 'entry.XXXXXXXXX'
       }
     };
 
