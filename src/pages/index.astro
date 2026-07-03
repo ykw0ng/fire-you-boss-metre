@@ -129,27 +129,22 @@ const WA = "https://wa.me/+6591731132";
         </p>
       </div>
 
+      <!--
+        This form sends submissions into a Google Form (responses land in its
+        linked Google Sheet). Configure the endpoint + field IDs in the
+        GOOGLE_FORM object inside the <script> at the bottom of this file.
+        Until it's configured, the form just shows the on-page thank-you.
+      -->
       <form
         id="guideForm"
         class="fbm-guide-form reveal mt-3"
-        action="https://api.web3forms.com/submit"
         method="POST"
       >
-        <!--
-          Web3Forms access key. Get a free one in ~30 seconds at https://web3forms.com
-          (enter the email where you want leads delivered; they email you the key).
-          Paste it below, replacing YOUR_WEB3FORMS_ACCESS_KEY. It is safe to expose
-          publicly — spam is blocked by the honeypot field below.
-        -->
-        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
-        <input type="hidden" name="subject" value="New Fire Your Boss guide request" />
-        <input type="hidden" name="from_name" value="Fire Your Boss Metre" />
-
-        <!-- Honeypot: humans leave this empty; bots fill it and get rejected -->
+        <!-- Honeypot: humans leave this empty; bots fill it and are dropped -->
         <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
 
         <!-- Carries the user's result into the submission for context -->
-        <input type="hidden" id="guideMeter" name="metre-result" value="" />
+        <input type="hidden" id="guideMeter" value="" />
 
         <div class="form-group">
           <label for="guideName">Name</label>
@@ -533,7 +528,28 @@ const WA = "https://wa.me/+6591731132";
       output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
-    // Lead form: submit to Web3Forms via fetch so we can show an inline thank-you.
+    // ── Lead form → Google Form ─────────────────────────────────
+    // Submissions are POSTed into a Google Form; responses appear in its
+    // linked Google Sheet (turn on email notifications in the Sheet if you
+    // want to be pinged per lead). To configure:
+    //   1. Build a Google Form with questions: Name, Contact number, Email,
+    //      and a short-answer "Metre result" (optional).
+    //   2. In the form's ⋮ menu choose "Get pre-filled link", fill dummy
+    //      answers, click "Get link". The link reveals each field's id, e.g.
+    //      ...?entry.123456789=John. Copy those entry IDs below.
+    //   3. FORM_ID is the long code in the form URL:
+    //      /forms/d/e/FORM_ID/viewform  → put it in `action`.
+    // Until FORM_ID is set, the form just shows the on-page thank-you.
+    var GOOGLE_FORM = {
+      action: 'https://docs.google.com/forms/d/e/FORM_ID/formResponse',
+      fields: {
+        name:  'entry.NAME_ID',
+        phone: 'entry.PHONE_ID',
+        email: 'entry.EMAIL_ID',
+        metre: 'entry.METRE_ID'   // optional — remove this line if you skip that question
+      }
+    };
+
     var guideForm = document.getElementById('guideForm');
     if (guideForm) {
       guideForm.addEventListener('submit', function (e) {
@@ -553,31 +569,38 @@ const WA = "https://wa.me/+6591731132";
           if (thanks) thanks.hidden = false;
         }
 
-        var keyField = guideForm.querySelector('input[name="access_key"]');
-        var key = keyField ? keyField.value : '';
+        // Honeypot: a bot ticked the hidden box — accept silently, send nothing.
+        var honey = guideForm.querySelector('input[name="botcheck"]');
+        if (honey && honey.checked) { showThanks(); return; }
 
-        // Not configured yet (placeholder key) or offline preview: just confirm to the user.
-        if (!key || key === 'YOUR_WEB3FORMS_ACCESS_KEY') {
+        // Not configured yet (placeholder id) or offline preview: just confirm.
+        if (GOOGLE_FORM.action.indexOf('FORM_ID') !== -1) {
           showThanks();
           return;
+        }
+
+        function val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+        var body = new URLSearchParams();
+        body.append(GOOGLE_FORM.fields.name,  val('guideName'));
+        body.append(GOOGLE_FORM.fields.phone, val('guidePhone'));
+        body.append(GOOGLE_FORM.fields.email, val('guideEmail'));
+        if (GOOGLE_FORM.fields.metre) {
+          body.append(GOOGLE_FORM.fields.metre, val('guideMeter'));
         }
 
         var submitBtn = guideForm.querySelector('button[type="submit"]');
         if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
 
-        fetch('https://api.web3forms.com/submit', {
+        // Google Forms sends no CORS headers, so we POST no-cors and can't read
+        // the response — treat a resolved fetch as success. A rejected fetch
+        // means the network failed, so show a retry error.
+        fetch(GOOGLE_FORM.action, {
           method: 'POST',
-          headers: { 'Accept': 'application/json' },
-          body: new FormData(guideForm)
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString()
         })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data && data.success) {
-              showThanks();
-            } else {
-              throw new Error((data && data.message) || 'Submission failed');
-            }
-          })
+          .then(function () { showThanks(); })
           .catch(function () {
             if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send Me the Guide →'; }
             if (errEl) {

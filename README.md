@@ -32,21 +32,30 @@ Assumptions: **3% inflation**, **5% investment return**, lifestyle funded to **a
 
 Illustration only — not financial advice.
 
-## Lead form (Web3Forms)
+## Lead form (Google Forms)
 
-The "Get the guide" form posts to [Web3Forms](https://web3forms.com), which emails each
-submission (name, phone, email, and the visitor's metre result) to you. No backend required,
-so it works on any static host including Cloudflare Pages.
+The "Get the guide" form posts submissions into a **Google Form** — responses land in its
+linked **Google Sheet** (and you can turn on per-response email notifications there). No
+backend of your own is needed, so it works on any static host including Cloudflare Pages.
 
 **Setup (one time):**
 
-1. Go to https://web3forms.com and enter the email address where you want leads delivered.
-2. They email you an **access key**.
-3. In `src/pages/index.astro`, find `YOUR_WEB3FORMS_ACCESS_KEY` and replace it with your key.
+1. Create a Google Form with these questions: **Name**, **Contact number**, **Email**, and
+   (optional) a short-answer **Metre result**.
+2. Open the form's **⋮ menu → Get pre-filled link**, type any dummy answers, click **Get link**,
+   and copy it. The link contains each field's ID, e.g. `entry.123456789=John`.
+3. In `src/pages/index.astro`, find the `GOOGLE_FORM` object and fill in:
+   - `action`: replace `FORM_ID` with the code from your form URL
+     (`/forms/d/e/FORM_ID/viewform`).
+   - `fields`: paste each `entry.NNN` ID (drop the `metre` line if you skipped that question).
 4. Commit and push — Cloudflare redeploys automatically.
 
-The access key is safe to keep in the public repo; spam is blocked by the hidden `botcheck`
-honeypot. Until a real key is set, the form just shows the on-page thank-you and stores nothing.
+Spam is blocked by the hidden `botcheck` honeypot. Until `FORM_ID` is set, the form just shows
+the on-page thank-you and stores nothing. Because Google Forms sends no CORS headers, the site
+submits "no-cors" and optimistically shows the thank-you; a network failure shows a retry error.
+
+Quickest alternative: if you'd rather not wire up field IDs, you can instead link the button
+straight to your Google Form's public URL (opens in a new tab) — simpler, but it leaves the page.
 
 ## Deploy on Cloudflare Pages
 
